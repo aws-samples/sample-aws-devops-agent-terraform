@@ -1,14 +1,9 @@
 # Variables for AWS DevOps Agent Configuration
 
 variable "aws_region" {
-  description = "AWS region for DevOps Agent (must be us-east-1)"
+  description = "AWS region for DevOps Agent deployment"
   type        = string
   default     = "us-east-1"
-  
-  validation {
-    condition     = var.aws_region == "us-east-1"
-    error_message = "AWS DevOps Agent is only available in us-east-1 region."
-  }
 }
 
 variable "agent_space_name" {
@@ -23,36 +18,16 @@ variable "agent_space_description" {
   default     = "AgentSpace for monitoring my application"
 }
 
-variable "enable_operator_app" {
-  description = "Whether to enable the operator app"
-  type        = bool
-  default     = true
-}
-
-variable "auth_flow" {
-  description = "Authentication flow for operator app (iam or idc)"
+variable "service_account_id" {
+  description = "Account ID of the secondary (service) account for cross-account monitoring. Leave empty to skip."
   type        = string
-  default     = "iam"
-  
-  validation {
-    condition     = contains(["iam", "idc"], var.auth_flow)
-    error_message = "Auth flow must be either 'iam' or 'idc'."
-  }
+  default     = ""
 }
 
-variable "external_accounts" {
-  description = "Map of external AWS accounts to associate (optional). Key is account ID, value is role ARN for cross-account access."
-  type = map(object({
-    account_id = string
-    role_arn   = string
-  }))
-  default = {}
-}
-
-variable "create_cross_account_roles" {
-  description = "Whether to create cross-account roles in external accounts (requires provider aliases)"
-  type        = bool
-  default     = false
+variable "agent_space_arn" {
+  description = "ARN of the Agent Space from the primary deployment. Required before deploying the service account resources."
+  type        = string
+  default     = ""
 }
 
 variable "name_postfix" {

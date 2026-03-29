@@ -23,6 +23,9 @@ Thumbs.db
 # Logs
 *.log
 
+# Build artifacts
+echo-service.zip
+
 # Backup files
 *.backup
 *.bak
