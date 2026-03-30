@@ -27,8 +27,8 @@ This guide is divided into two parts:
 | Resource | Name | Purpose |
 |----------|------|---------|
 | Agent Space | Configurable | Central agent space with operator app |
-| IAM Role | DevOpsAgentRole-AgentSpace-* | Assumed by the agent to monitor the account |
-| IAM Role | DevOpsAgentRole-WebappAdmin-* | Operator app role |
+| IAM Role | DevOpsAgentRole-AgentSpace-* | Assumed by the agent to monitor the account. Uses `AIDevOpsAgentAccessPolicy` managed policy. |
+| IAM Role | DevOpsAgentRole-WebappAdmin-* | Operator app role. Uses `AIDevOpsOperatorAppAccessPolicy` managed policy. |
 | Association | AWS (monitor) | Links the monitoring account |
 | Association | AWS (source) | Links the service account (optional) |
 
@@ -36,7 +36,7 @@ This guide is divided into two parts:
 
 | Resource | Name | Purpose |
 |----------|------|---------|
-| IAM Role | DevOpsAgentRole-SecondaryAccount-TF | Cross-account role trusted by the Agent Space |
+| IAM Role | DevOpsAgentRole-SecondaryAccount-TF | Cross-account role trusted by the Agent Space. Uses `AIDevOpsAgentAccessPolicy` managed policy. |
 | Lambda | echo-service-tf | Example service |
 
 ## Usage

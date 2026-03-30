@@ -39,12 +39,6 @@ resource "aws_iam_role" "devops_agentspace" {
   tags = var.tags
 }
 
-# Attach AWS managed policy to Agent Space role
-resource "aws_iam_role_policy_attachment" "devops_agentspace_managed" {
-  role       = aws_iam_role.devops_agentspace.name
-  policy_arn = "arn:aws:iam::aws:policy/AIOpsAssistantPolicy"
-}
-
 # Attach AIDevOpsAgentAccessPolicy managed policy to Agent Space role
 resource "aws_iam_role_policy_attachment" "devops_agentspace_access" {
   role       = aws_iam_role.devops_agentspace.name
@@ -107,59 +101,8 @@ resource "aws_iam_role" "devops_operator" {
   tags = var.tags
 }
 
-# Inline policy for Operator App role
-data "aws_iam_policy_document" "devops_operator_inline" {
-  statement {
-    sid    = "AllowBasicOperatorActions"
-    effect = "Allow"
-
-    actions = [
-      "aidevops:GetAgentSpace",
-      "aidevops:GetAssociation",
-      "aidevops:ListAssociations",
-      "aidevops:CreateBacklogTask",
-      "aidevops:GetBacklogTask",
-      "aidevops:UpdateBacklogTask",
-      "aidevops:ListBacklogTasks",
-      "aidevops:ListChildExecutions",
-      "aidevops:ListJournalRecords",
-      "aidevops:DiscoverTopology",
-      "aidevops:InvokeAgent",
-      "aidevops:ListGoals",
-      "aidevops:ListRecommendations",
-      "aidevops:ListExecutions",
-      "aidevops:GetRecommendation",
-      "aidevops:UpdateRecommendation",
-      "aidevops:CreateKnowledgeItem",
-      "aidevops:ListKnowledgeItems",
-      "aidevops:GetKnowledgeItem",
-      "aidevops:UpdateKnowledgeItem",
-      "aidevops:ListPendingMessages",
-      "aidevops:InitiateChatForCase",
-      "aidevops:EndChatForCase",
-      "aidevops:DescribeSupportLevel",
-      "aidevops:SendChatMessage"
-    ]
-
-    resources = ["arn:aws:aidevops:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:agentspace/*"]
-  }
-
-  statement {
-    sid    = "AllowSupportOperatorActions"
-    effect = "Allow"
-
-    actions = [
-      "support:DescribeCases",
-      "support:InitiateChatForCase",
-      "support:DescribeSupportLevel"
-    ]
-
-    resources = ["*"]
-  }
-}
-
-resource "aws_iam_role_policy" "devops_operator_inline" {
-  name   = "AIDevOpsBasicOperatorActionsPolicy"
-  role   = aws_iam_role.devops_operator.id
-  policy = data.aws_iam_policy_document.devops_operator_inline.json
+# Attach AIDevOpsOperatorAppAccessPolicy managed policy to Operator App role
+resource "aws_iam_role_policy_attachment" "devops_operator_access" {
+  role       = aws_iam_role.devops_operator.name
+  policy_arn = "arn:aws:iam::aws:policy/AIDevOpsOperatorAppAccessPolicy"
 }

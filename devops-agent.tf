@@ -4,11 +4,10 @@
 resource "time_sleep" "wait_for_iam_propagation" {
   depends_on = [
     aws_iam_role.devops_agentspace,
-    aws_iam_role_policy_attachment.devops_agentspace_managed,
     aws_iam_role_policy_attachment.devops_agentspace_access,
     aws_iam_role_policy.devops_agentspace_inline,
     aws_iam_role.devops_operator,
-    aws_iam_role_policy.devops_operator_inline
+    aws_iam_role_policy_attachment.devops_operator_access
   ]
 
   create_duration = "30s"

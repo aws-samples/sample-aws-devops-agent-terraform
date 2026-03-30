@@ -41,15 +41,6 @@ data "aws_iam_policy_document" "secondary_account_trust" {
   }
 }
 
-# Attach AIOpsAssistantPolicy managed policy
-resource "aws_iam_role_policy_attachment" "secondary_account_managed" {
-  count    = var.agent_space_arn != "" ? 1 : 0
-  provider = aws.service
-
-  role       = aws_iam_role.secondary_account[0].name
-  policy_arn = "arn:aws:iam::aws:policy/AIOpsAssistantPolicy"
-}
-
 # Attach AIDevOpsAgentAccessPolicy managed policy
 resource "aws_iam_role_policy_attachment" "secondary_account_access" {
   count    = var.agent_space_arn != "" ? 1 : 0
@@ -57,6 +48,33 @@ resource "aws_iam_role_policy_attachment" "secondary_account_access" {
 
   role       = aws_iam_role.secondary_account[0].name
   policy_arn = "arn:aws:iam::aws:policy/AIDevOpsAgentAccessPolicy"
+}
+
+# Inline policy for creating Resource Explorer service-linked role
+data "aws_iam_policy_document" "secondary_account_inline" {
+  count = var.agent_space_arn != "" ? 1 : 0
+
+  statement {
+    sid    = "AllowCreateServiceLinkedRoles"
+    effect = "Allow"
+
+    actions = [
+      "iam:CreateServiceLinkedRole"
+    ]
+
+    resources = [
+      "arn:aws:iam::${var.service_account_id}:role/aws-service-role/resource-explorer-2.amazonaws.com/AWSServiceRoleForResourceExplorer"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "secondary_account_inline" {
+  count    = var.agent_space_arn != "" ? 1 : 0
+  provider = aws.service
+
+  name   = "AllowCreateServiceLinkedRoles"
+  role   = aws_iam_role.secondary_account[0].id
+  policy = data.aws_iam_policy_document.secondary_account_inline[0].json
 }
 
 # Echo Lambda function — simple example service (matches CDK ServiceStack)
