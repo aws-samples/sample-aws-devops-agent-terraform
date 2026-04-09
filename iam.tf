@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "devops_operator_trust" {
       identifiers = ["aidevops.amazonaws.com"]
     }
 
-    actions = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRole", "sts:TagSession"]
 
     condition {
       test     = "StringEquals"
