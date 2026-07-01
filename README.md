@@ -15,10 +15,11 @@ AWS DevOps Agent helps you monitor and manage your AWS infrastructure using AI-p
 
 ## What this guide covers
 
-This guide is divided into two parts:
+This guide is divided into three parts:
 
 - **Part 1** — Deploy an agent space with an operator app and an AWS association in your monitoring account. After completing this part, the agent can monitor issues in that account.
 - **Part 2 (Optional)** — Add a source AWS association for a service account and deploy a cross-account IAM role plus an echo Lambda into that account.
+- **Part 3 (Optional)** — Register third-party services (Dynatrace, ServiceNow, Splunk, New Relic, GitLab, PagerDuty, Datadog) and associate them with the agent space.
 
 ## Resources Created
 
@@ -38,6 +39,20 @@ This guide is divided into two parts:
 |----------|------|---------|
 | IAM Role | DevOpsAgentRole-SecondaryAccount-TF | Cross-account role trusted by the Agent Space. Uses `AIDevOpsAgentAccessPolicy` managed policy. |
 | Lambda | echo-service-tf | Example service |
+
+### Part 3: Third-Party Integrations (Optional)
+
+Each integration you enable creates a service registration plus an association with the agent space:
+
+| Resource | Service type | Auth |
+|----------|--------------|------|
+| Dynatrace | `dynatrace` | OAuth client credentials |
+| ServiceNow | `servicenow` | OAuth client credentials |
+| Splunk | `mcpserversplunk` | Bearer token |
+| New Relic | `mcpservernewrelic` | API key |
+| GitLab | `gitlab` | Access token |
+| PagerDuty | `pagerduty` | OAuth client credentials |
+| Datadog | `mcpserver` (generic MCP server) | API key |
 
 ## Usage
 
@@ -120,6 +135,33 @@ This guide is divided into two parts:
    cat response.json
    ```
 
+### Part 3 (Optional): Register Third-Party Integrations
+
+Third-party integrations are configured through the `integrations` variable. Because these resources reference the agent space directly, they can be deployed in the same `terraform apply` as Part 1 (no separate phase or agent space ID wiring is required, unlike the CDK `IntegrationsStack`).
+
+1. **Add an `integrations` block** to `terraform.tfvars`, populating only the services you want. See `terraform.tfvars.example` for the full shape. For example:
+   ```hcl
+   integrations = {
+     dynatrace = {
+       account_urn   = "<DYNATRACE_ACCOUNT_URN>"
+       client_id     = "<DYNATRACE_CLIENT_ID>"
+       client_name   = "<DYNATRACE_CLIENT_NAME>"
+       client_secret = "<DYNATRACE_CLIENT_SECRET>"
+       env_id        = "<DYNATRACE_ENVIRONMENT_ID>"
+       resources     = ["<DYNATRACE_RESOURCE_1>"]
+     }
+   }
+   ```
+
+2. **Apply**:
+   ```bash
+   terraform apply
+   ```
+
+3. **Review the outputs** — `integration_service_ids` and `integration_association_ids` map each enabled service to its registered IDs.
+
+> **Security:** the `integrations` variable is marked `sensitive`, so its values are redacted from plan/apply output. Do not commit real credentials to `terraform.tfvars`. For production, source secrets from AWS Secrets Manager or SSM Parameter Store (e.g. via `data` sources) rather than plaintext.
+
 ## Configuration Options
 
 | Variable | Description | Default |
@@ -131,6 +173,7 @@ This guide is divided into two parts:
 | `agent_space_arn` | Agent Space ARN (required for Part 2) | `""` |
 | `name_postfix` | Postfix for IAM role names | `""` |
 | `tags` | Tags for all resources | See variables.tf |
+| `integrations` | Optional third-party integrations (Dynatrace, ServiceNow, Splunk, New Relic, GitLab, PagerDuty, Datadog). Sensitive. | `{}` |
 
 ## Troubleshooting
 

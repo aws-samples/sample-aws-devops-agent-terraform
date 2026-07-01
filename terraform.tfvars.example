@@ -26,3 +26,67 @@ tags = {
   Owner       = "devops-team"
   CostCenter  = "engineering"
 }
+
+# Part 3 (Optional): Third-party integrations
+# Uncomment and fill in only the services you want to register. Each populated
+# block registers a service and associates it with the Agent Space in the same
+# apply. These carry secrets — prefer Secrets Manager / SSM over plaintext here,
+# and never commit real credentials.
+#
+# integrations = {
+#   dynatrace = {
+#     account_urn   = "<DYNATRACE_ACCOUNT_URN>"
+#     client_id     = "<DYNATRACE_CLIENT_ID>"
+#     client_name   = "<DYNATRACE_CLIENT_NAME>"
+#     client_secret = "<DYNATRACE_CLIENT_SECRET>"
+#     env_id        = "<DYNATRACE_ENVIRONMENT_ID>"
+#     resources     = ["<DYNATRACE_RESOURCE_1>"]
+#   }
+#
+#   service_now = {
+#     instance_url  = "<SERVICENOW_INSTANCE_URL>"
+#     client_id     = "<SERVICENOW_CLIENT_ID>"
+#     client_name   = "<SERVICENOW_CLIENT_NAME>"
+#     client_secret = "<SERVICENOW_CLIENT_SECRET>"
+#   }
+#
+#   splunk = {
+#     name        = "<SPLUNK_NAME>"
+#     endpoint    = "https://<XXX>.api.scs.splunk.com/<XXX>/mcp/v1/"
+#     token_name  = "<SPLUNK_TOKEN_NAME>"
+#     token_value = "<SPLUNK_TOKEN_VALUE>"
+#   }
+#
+#   new_relic = {
+#     api_key    = "<NEW_RELIC_API_KEY>"
+#     account_id = "<NEW_RELIC_ACCOUNT_ID>"
+#     region     = "US"
+#     endpoint   = "https://mcp.newrelic.com/mcp/"
+#   }
+#
+#   git_lab = {
+#     target_url   = "https://gitlab.com"
+#     token_type   = "group"
+#     token_value  = "<GITLAB_ACCESS_TOKEN>"
+#     group_id     = "<GITLAB_GROUP_ID>"
+#     project_id   = "<GITLAB_PROJECT_ID>"
+#     project_path = "<NAMESPACE/PROJECT_NAME>"
+#   }
+#
+#   pager_duty = {
+#     client_id      = "<PAGERDUTY_CLIENT_ID>"
+#     client_name    = "<PAGERDUTY_CLIENT_NAME>"
+#     client_secret  = "<PAGERDUTY_CLIENT_SECRET>"
+#     customer_email = "<PAGERDUTY_API_HEADER_EMAIL>"
+#     services       = ["<PAGERDUTY_SERVICE_ID>"]
+#   }
+#
+#   # Datadog registers as a generic MCP server (service_type "mcpserver").
+#   datadog = {
+#     name           = "datadog"
+#     endpoint       = "https://mcp.datadoghq.com/api/unstable/mcp-server/mcp"
+#     api_key_value  = "<DATADOG_API_KEY>"
+#     api_key_name   = "<DATADOG_API_KEY_NAME>"
+#     api_key_header = "DD-API-KEY"
+#   }
+# }
