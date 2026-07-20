@@ -27,3 +27,9 @@ data "aws_caller_identity" "current" {}
 
 # Data source to get current AWS region
 data "aws_region" "current" {}
+
+# Resolve role ARNs: use existing if provided, otherwise use created roles
+locals {
+  agentspace_role_arn = var.existing_agentspace_role_arn != "" ? var.existing_agentspace_role_arn : aws_iam_role.devops_agentspace[0].arn
+  operator_role_arn   = var.existing_operator_role_arn != "" ? var.existing_operator_role_arn : aws_iam_role.devops_operator[0].arn
+}

@@ -7,6 +7,7 @@ resource "random_id" "suffix" {
 
 # Trust policy for DevOps Agent Space Role
 data "aws_iam_policy_document" "devops_agentspace_trust" {
+  count = var.existing_agentspace_role_arn == "" ? 1 : 0
   statement {
     effect = "Allow"
 
@@ -33,20 +34,23 @@ data "aws_iam_policy_document" "devops_agentspace_trust" {
 
 # DevOps Agent Space Role
 resource "aws_iam_role" "devops_agentspace" {
+  count              = var.existing_agentspace_role_arn == "" ? 1 : 0
   name               = "DevOpsAgentRole-AgentSpace-${var.name_postfix != "" ? var.name_postfix : random_id.suffix.hex}"
-  assume_role_policy = data.aws_iam_policy_document.devops_agentspace_trust.json
+  assume_role_policy = data.aws_iam_policy_document.devops_agentspace_trust[0].json
 
   tags = var.tags
 }
 
 # Attach AIDevOpsAgentAccessPolicy managed policy to Agent Space role
 resource "aws_iam_role_policy_attachment" "devops_agentspace_access" {
-  role       = aws_iam_role.devops_agentspace.name
+  count      = var.existing_agentspace_role_arn == "" ? 1 : 0
+  role       = aws_iam_role.devops_agentspace[0].name
   policy_arn = "arn:aws:iam::aws:policy/AIDevOpsAgentAccessPolicy"
 }
 
 # Inline policy for creating Resource Explorer service-linked role
 data "aws_iam_policy_document" "devops_agentspace_inline" {
+  count = var.existing_agentspace_role_arn == "" ? 1 : 0
   statement {
     sid    = "AllowCreateServiceLinkedRoles"
     effect = "Allow"
@@ -62,13 +66,15 @@ data "aws_iam_policy_document" "devops_agentspace_inline" {
 }
 
 resource "aws_iam_role_policy" "devops_agentspace_inline" {
+  count  = var.existing_agentspace_role_arn == "" ? 1 : 0
   name   = "AllowCreateServiceLinkedRoles"
-  role   = aws_iam_role.devops_agentspace.id
-  policy = data.aws_iam_policy_document.devops_agentspace_inline.json
+  role   = aws_iam_role.devops_agentspace[0].id
+  policy = data.aws_iam_policy_document.devops_agentspace_inline[0].json
 }
 
 # Trust policy for Operator App Role
 data "aws_iam_policy_document" "devops_operator_trust" {
+  count = var.existing_operator_role_arn == "" ? 1 : 0
   statement {
     effect = "Allow"
 
@@ -95,14 +101,16 @@ data "aws_iam_policy_document" "devops_operator_trust" {
 
 # DevOps Operator App Role
 resource "aws_iam_role" "devops_operator" {
+  count              = var.existing_operator_role_arn == "" ? 1 : 0
   name               = "DevOpsAgentRole-WebappAdmin-${var.name_postfix != "" ? var.name_postfix : random_id.suffix.hex}"
-  assume_role_policy = data.aws_iam_policy_document.devops_operator_trust.json
+  assume_role_policy = data.aws_iam_policy_document.devops_operator_trust[0].json
 
   tags = var.tags
 }
 
 # Attach AIDevOpsOperatorAppAccessPolicy managed policy to Operator App role
 resource "aws_iam_role_policy_attachment" "devops_operator_access" {
-  role       = aws_iam_role.devops_operator.name
+  count      = var.existing_operator_role_arn == "" ? 1 : 0
+  role       = aws_iam_role.devops_operator[0].name
   policy_arn = "arn:aws:iam::aws:policy/AIDevOpsOperatorAppAccessPolicy"
 }

@@ -83,3 +83,6 @@ tags = {
 #   }
 # }
 # }
+# --- Option: Use existing IAM roles instead of creating new ones ---
+# existing_agentspace_role_arn = "arn:aws:iam::ACCOUNT_ID:role/YourAgentSpaceRole"
+# existing_operator_role_arn   = "arn:aws:iam::ACCOUNT_ID:role/YourOperatorRole"

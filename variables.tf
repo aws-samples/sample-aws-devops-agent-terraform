@@ -107,6 +107,23 @@ variable "integrations" {
       services       = optional(list(string))
     }))
   })
-
   default = {}
+}
+
+# -----------------------------------------------------------------------------
+# Existing IAM Roles (Optional)
+# -----------------------------------------------------------------------------
+# Set these to use pre-existing IAM roles instead of creating new ones.
+# When provided, the corresponding role creation in iam.tf is skipped.
+
+variable "existing_agentspace_role_arn" {
+  description = "ARN of an existing IAM role for the Agent Space. If set, skips role creation. Must trust aidevops.amazonaws.com with sts:AssumeRole and have AIDevOpsAgentAccessPolicy attached."
+  type        = string
+  default     = ""
+}
+
+variable "existing_operator_role_arn" {
+  description = "ARN of an existing IAM role for the Operator App. If set, skips role creation. Must trust aidevops.amazonaws.com with sts:AssumeRole + sts:TagSession and have AIDevOpsOperatorAppAccessPolicy attached."
+  type        = string
+  default     = ""
 }
