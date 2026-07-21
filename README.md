@@ -15,10 +15,11 @@ AWS DevOps Agent helps you monitor and manage your AWS infrastructure using AI-p
 
 ## What this guide covers
 
-This guide is divided into two parts:
+This guide is divided into three parts:
 
 - **Part 1** — Deploy an agent space with an operator app and an AWS association in your monitoring account. After completing this part, the agent can monitor issues in that account.
 - **Part 2 (Optional)** — Add a source AWS association for a service account and deploy a cross-account IAM role plus an echo Lambda into that account.
+- **Part 3 (Optional)** — Register third-party services (Dynatrace, ServiceNow, Splunk, New Relic, GitLab, PagerDuty) and associate them with the agent space.
 
 ## Resources Created
 
@@ -38,6 +39,21 @@ This guide is divided into two parts:
 |----------|------|---------|
 | IAM Role | DevOpsAgentRole-SecondaryAccount-TF | Cross-account role trusted by the Agent Space. Uses `AIDevOpsAgentAccessPolicy` managed policy. |
 | Lambda | echo-service-tf | Example service |
+
+### Part 3: Third-Party Integrations (Optional)
+
+Each integration you enable creates a service registration plus an association with the agent space:
+
+| Resource | Service type | Auth |
+|----------|--------------|------|
+| Dynatrace | `dynatrace` | OAuth client credentials |
+| ServiceNow | `servicenow` | OAuth client credentials |
+| Splunk | `mcpserversplunk` | Bearer token |
+| New Relic | `mcpservernewrelic` | API key |
+| GitLab | `gitlab` | Access token |
+| PagerDuty | `pagerduty` | OAuth client credentials |
+
+> **Datadog is not included.** Connecting Datadog requires interactive user OAuth authorization (browser login + consent) per the [Datadog connection guide](https://docs.aws.amazon.com/devopsagent/latest/userguide/connecting-telemetry-sources-connecting-datadog.html), which Terraform cannot automate. Register Datadog manually through the Capability Providers page in the console.
 
 ## Usage
 
@@ -120,6 +136,35 @@ This guide is divided into two parts:
    cat response.json
    ```
 
+### Part 3 (Optional): Register Third-Party Integrations
+
+Third-party integrations are configured through the `integrations` variable. Because these resources reference the agent space directly, they can be deployed in the same `terraform apply` as Part 1 (no separate phase or agent space ID wiring is required, unlike the CDK `IntegrationsStack`).
+
+1. **Add an `integrations` block** to `terraform.tfvars`, populating only the services you want. See `terraform.tfvars.example` for the full shape. For example:
+   ```hcl
+   integrations = {
+     dynatrace = {
+       account_urn   = "<DYNATRACE_ACCOUNT_URN>"
+       client_id     = "<DYNATRACE_CLIENT_ID>"
+       client_name   = "<DYNATRACE_CLIENT_NAME>"
+       client_secret = "<DYNATRACE_CLIENT_SECRET>"
+       env_id        = "<DYNATRACE_ENVIRONMENT_ID>"
+       resources     = ["<DYNATRACE_RESOURCE_1>"]
+     }
+   }
+   ```
+
+   > **ServiceNow gotcha:** always set `instance_id` explicitly (the short instance name, e.g. `"ven04972"` — not the full `instance_url`). If `instance_id` is omitted, the association falls back to `instance_url`, which the DevOps Agent API rejects with a `400 GeneralServiceException: instanceId '<url>' does not match the registered ServiceNow instance`.
+
+2. **Apply**:
+   ```bash
+   terraform apply
+   ```
+
+3. **Review the outputs** — `integration_service_ids` and `integration_association_ids` map each enabled service to its registered IDs.
+
+> **Security:** the `integrations` variable is marked `sensitive`, so its values are redacted from plan/apply output. Do not commit real credentials to `terraform.tfvars`. For production, source secrets from AWS Secrets Manager or SSM Parameter Store (e.g. via `data` sources) rather than plaintext.
+
 ## Configuration Options
 
 | Variable | Description | Default |
@@ -131,10 +176,13 @@ This guide is divided into two parts:
 | `agent_space_arn` | Agent Space ARN (required for Part 2) | `""` |
 | `name_postfix` | Postfix for IAM role names | `""` |
 | `tags` | Tags for all resources | See variables.tf |
+| `integrations` | Optional third-party integrations (Dynatrace, ServiceNow, Splunk, New Relic, GitLab, PagerDuty). Datadog must be connected manually — see note above. Sensitive. | `{}` |
 
 ## Troubleshooting
 
-- IAM propagation delays: The configuration includes a 30-second `time_sleep` between IAM role creation and Agent Space creation. The DevOps Agent service validates the operator role's trust policy during Agent Space creation, and this can fail if IAM hasn't fully propagated. If you still see trust policy errors, wait a minute and run `terraform apply` again — the IAM roles will already exist and the apply will pick up where it left off.
+- **IAM propagation delays**: The configuration includes a 30-second `time_sleep` between IAM role creation and Agent Space creation. The DevOps Agent service validates the operator role's trust policy during Agent Space creation, and this can fail if IAM hasn't fully propagated. If you still see trust policy errors, wait a minute and run `terraform apply` again — the IAM roles will already exist and the apply will pick up where it left off.
+- **ServiceNow `instanceId does not match` error**: Set `instance_id` explicitly in the `service_now` integration block to the short instance name (e.g. `"ven04972"`), not the full `instance_url`. See the note in [Part 3](#part-3-optional-register-third-party-integrations) above.
+- **Dynatrace association `status: invalid`**: If `terraform apply` succeeds but the resulting association reports `status = "invalid"` (visible via `aws devops-agent get-association` or the console), this indicates Dynatrace rejected the OAuth client credentials — double-check `client_id`, `client_secret`, and `account_urn` against the Dynatrace account, rather than a Terraform configuration issue.
 
 ## Cleanup
 

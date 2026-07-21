@@ -49,3 +49,31 @@ output "aws_region" {
   description = "AWS region"
   value       = data.aws_region.current.name
 }
+
+# --- Third-party integration outputs ---
+# Maps each enabled integration to its registered service ID and association ID.
+# Empty when no integrations are configured.
+
+output "integration_service_ids" {
+  description = "Service IDs of registered third-party integrations, keyed by service name."
+  value = merge(
+    local.enable_dynatrace ? { dynatrace = awscc_devopsagent_service.dynatrace[0].service_id } : {},
+    local.enable_service_now ? { service_now = awscc_devopsagent_service.service_now[0].service_id } : {},
+    local.enable_splunk ? { splunk = awscc_devopsagent_service.splunk[0].service_id } : {},
+    local.enable_new_relic ? { new_relic = awscc_devopsagent_service.new_relic[0].service_id } : {},
+    local.enable_git_lab ? { git_lab = awscc_devopsagent_service.git_lab[0].service_id } : {},
+    local.enable_pager_duty ? { pager_duty = awscc_devopsagent_service.pager_duty[0].service_id } : {},
+  )
+}
+
+output "integration_association_ids" {
+  description = "Association IDs of registered third-party integrations, keyed by service name."
+  value = merge(
+    local.enable_dynatrace ? { dynatrace = awscc_devopsagent_association.dynatrace[0].association_id } : {},
+    local.enable_service_now ? { service_now = awscc_devopsagent_association.service_now[0].association_id } : {},
+    local.enable_splunk ? { splunk = awscc_devopsagent_association.splunk[0].association_id } : {},
+    local.enable_new_relic ? { new_relic = awscc_devopsagent_association.new_relic[0].association_id } : {},
+    local.enable_git_lab ? { git_lab = awscc_devopsagent_association.git_lab[0].association_id } : {},
+    local.enable_pager_duty ? { pager_duty = awscc_devopsagent_association.pager_duty[0].association_id } : {},
+  )
+}

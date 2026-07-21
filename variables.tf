@@ -44,3 +44,69 @@ variable "tags" {
     Project     = "aws-devops-agent"
   }
 }
+
+# Third-party integrations (mirrors the CDK IntegrationConfig / INTEGRATIONS).
+# Populate only the services you want to register; leave the rest unset. The
+# whole variable is marked sensitive because it carries OAuth secrets, bearer
+# tokens and API keys. Prefer sourcing these from Secrets Manager / SSM in
+# production rather than a plaintext tfvars file.
+variable "integrations" {
+  description = "Optional third-party service integrations to register and associate with the Agent Space."
+  sensitive   = true
+
+  type = object({
+    dynatrace = optional(object({
+      account_urn   = string
+      client_id     = string
+      client_name   = string
+      client_secret = string
+      env_id        = string
+      resources     = optional(list(string), [])
+    }))
+
+    service_now = optional(object({
+      instance_url  = string
+      client_id     = string
+      client_name   = string
+      client_secret = string
+      instance_id   = optional(string)
+    }))
+
+    splunk = optional(object({
+      name        = string
+      endpoint    = string
+      token_name  = string
+      token_value = string
+    }))
+
+    new_relic = optional(object({
+      api_key          = string
+      account_id       = string
+      endpoint         = optional(string, "https://mcp.newrelic.com/mcp/")
+      region           = optional(string, "US")
+      application_ids  = optional(list(string))
+      entity_guids     = optional(list(string))
+      alert_policy_ids = optional(list(string))
+    }))
+
+    git_lab = optional(object({
+      target_url   = string
+      token_type   = string
+      token_value  = string
+      project_id   = string
+      project_path = string
+      group_id     = optional(string)
+    }))
+
+    pager_duty = optional(object({
+      client_id      = string
+      client_name    = string
+      client_secret  = string
+      scopes         = optional(list(string))
+      customer_email = optional(string)
+      services       = optional(list(string))
+    }))
+  })
+
+  default = {}
+}
