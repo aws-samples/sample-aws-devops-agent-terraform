@@ -17,12 +17,12 @@ output "agent_space_name" {
 
 output "devops_agentspace_role_arn" {
   description = "ARN of the DevOps Agent Space IAM role"
-  value       = aws_iam_role.devops_agentspace.arn
+  value       = local.agentspace_role_arn
 }
 
 output "devops_operator_role_arn" {
   description = "ARN of the DevOps Operator App IAM role"
-  value       = aws_iam_role.devops_operator.arn
+  value       = local.operator_role_arn
 }
 
 output "primary_account_id" {
@@ -37,7 +37,7 @@ output "primary_account_association_id" {
 
 output "secondary_account_role_arn" {
   description = "ARN of the Secondary Account Role for Agent Space"
-  value       = var.agent_space_arn != "" ? aws_iam_role.secondary_account[0].arn : null
+  value       = var.agent_space_arn != "" ? var.agent_space_arn != "" && var.service_account_id != "" ? var.agent_space_arn != "" && var.service_account_id != "" ? aws_iam_role.secondary_account[0].arn : null : null : null
 }
 
 output "secondary_account_association_id" {
