@@ -106,11 +106,6 @@ variable "integrations" {
       customer_email = optional(string)
       services       = optional(list(string))
     }))
-
-    # NOTE: Datadog is not included here. It requires interactive user OAuth
-    # authorization (browser login + consent) that Terraform cannot automate.
-    # See the comment in integrations.tf for details; register it manually
-    # through the console instead.
   })
 
   default = {}

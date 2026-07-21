@@ -81,9 +81,5 @@ tags = {
 #     customer_email = "<PAGERDUTY_API_HEADER_EMAIL>"
 #     services       = ["<PAGERDUTY_SERVICE_ID>"]
 #   }
-#
-#   # Datadog is NOT supported here — it requires interactive user OAuth
-#   # authorization (browser login + consent), which Terraform cannot drive.
-#   # Register it manually through the console instead. See:
-#   # https://docs.aws.amazon.com/devopsagent/latest/userguide/connecting-telemetry-sources-connecting-datadog.html
+# }
 # }

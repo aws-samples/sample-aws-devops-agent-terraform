@@ -246,17 +246,3 @@ resource "awscc_devopsagent_association" "pager_duty" {
 
   depends_on = [awscc_devopsagent_service.pager_duty]
 }
-
-# ---------------------------------------------------------------------------
-# Datadog is intentionally NOT supported here.
-#
-# Per the AWS DevOps Agent docs, connecting Datadog requires interactive user
-# OAuth authorization (log in to Datadog, click Allow/authorize in a browser
-# redirect flow) rather than a machine-to-machine credential. Terraform has no
-# way to drive that browser-based consent step, so Datadog cannot be
-# registered declaratively like Dynatrace/ServiceNow/PagerDuty (OAuth client
-# credentials) or Splunk/New Relic (bearer token / API key).
-#
-# To connect Datadog, register it manually through the console:
-# https://docs.aws.amazon.com/devopsagent/latest/userguide/connecting-telemetry-sources-connecting-datadog.html
-# ---------------------------------------------------------------------------
