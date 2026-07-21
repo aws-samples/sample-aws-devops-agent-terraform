@@ -28,7 +28,6 @@ locals {
   enable_new_relic   = nonsensitive(var.integrations.new_relic != null)
   enable_git_lab     = nonsensitive(var.integrations.git_lab != null)
   enable_pager_duty  = nonsensitive(var.integrations.pager_duty != null)
-  enable_datadog     = nonsensitive(var.integrations.datadog != null)
 }
 
 # ---------------------------------------------------------------------------
@@ -249,41 +248,15 @@ resource "awscc_devopsagent_association" "pager_duty" {
 }
 
 # ---------------------------------------------------------------------------
-# Datadog (registered as a generic MCP server "mcpserver", API-key auth, then
-# associated via the Datadog-specific association block)
+# Datadog is intentionally NOT supported here.
+#
+# Per the AWS DevOps Agent docs, connecting Datadog requires interactive user
+# OAuth authorization (log in to Datadog, click Allow/authorize in a browser
+# redirect flow) rather than a machine-to-machine credential. Terraform has no
+# way to drive that browser-based consent step, so Datadog cannot be
+# registered declaratively like Dynatrace/ServiceNow/PagerDuty (OAuth client
+# credentials) or Splunk/New Relic (bearer token / API key).
+#
+# To connect Datadog, register it manually through the console:
+# https://docs.aws.amazon.com/devopsagent/latest/userguide/connecting-telemetry-sources-connecting-datadog.html
 # ---------------------------------------------------------------------------
-resource "awscc_devopsagent_service" "datadog" {
-  count        = local.enable_datadog ? 1 : 0
-  service_type = "mcpserver"
-
-  service_details = {
-    mcp_server = {
-      name        = var.integrations.datadog.name
-      endpoint    = var.integrations.datadog.endpoint
-      description = var.integrations.datadog.description
-      authorization_config = {
-        api_key = {
-          api_key_name   = var.integrations.datadog.api_key_name
-          api_key_value  = var.integrations.datadog.api_key_value
-          api_key_header = var.integrations.datadog.api_key_header
-        }
-      }
-    }
-  }
-}
-
-resource "awscc_devopsagent_association" "datadog" {
-  count          = local.enable_datadog ? 1 : 0
-  agent_space_id = awscc_devopsagent_agent_space.main.id
-  service_id     = awscc_devopsagent_service.datadog[0].service_id
-
-  configuration = {
-    mcp_server_datadog = {
-      name        = var.integrations.datadog.name
-      endpoint    = var.integrations.datadog.endpoint
-      description = var.integrations.datadog.description
-    }
-  }
-
-  depends_on = [awscc_devopsagent_service.datadog]
-}

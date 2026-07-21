@@ -19,7 +19,7 @@ This guide is divided into three parts:
 
 - **Part 1** — Deploy an agent space with an operator app and an AWS association in your monitoring account. After completing this part, the agent can monitor issues in that account.
 - **Part 2 (Optional)** — Add a source AWS association for a service account and deploy a cross-account IAM role plus an echo Lambda into that account.
-- **Part 3 (Optional)** — Register third-party services (Dynatrace, ServiceNow, Splunk, New Relic, GitLab, PagerDuty, Datadog) and associate them with the agent space.
+- **Part 3 (Optional)** — Register third-party services (Dynatrace, ServiceNow, Splunk, New Relic, GitLab, PagerDuty) and associate them with the agent space.
 
 ## Resources Created
 
@@ -52,7 +52,8 @@ Each integration you enable creates a service registration plus an association w
 | New Relic | `mcpservernewrelic` | API key |
 | GitLab | `gitlab` | Access token |
 | PagerDuty | `pagerduty` | OAuth client credentials |
-| Datadog | `mcpserver` (generic MCP server) | API key |
+
+> **Datadog is not included.** Connecting Datadog requires interactive user OAuth authorization (browser login + consent) per the [Datadog connection guide](https://docs.aws.amazon.com/devopsagent/latest/userguide/connecting-telemetry-sources-connecting-datadog.html), which Terraform cannot automate. Register Datadog manually through the Capability Providers page in the console.
 
 ## Usage
 
@@ -173,7 +174,7 @@ Third-party integrations are configured through the `integrations` variable. Bec
 | `agent_space_arn` | Agent Space ARN (required for Part 2) | `""` |
 | `name_postfix` | Postfix for IAM role names | `""` |
 | `tags` | Tags for all resources | See variables.tf |
-| `integrations` | Optional third-party integrations (Dynatrace, ServiceNow, Splunk, New Relic, GitLab, PagerDuty, Datadog). Sensitive. | `{}` |
+| `integrations` | Optional third-party integrations (Dynatrace, ServiceNow, Splunk, New Relic, GitLab, PagerDuty). Datadog must be connected manually — see note above. Sensitive. | `{}` |
 
 ## Troubleshooting
 

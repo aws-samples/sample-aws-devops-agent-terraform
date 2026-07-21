@@ -63,7 +63,6 @@ output "integration_service_ids" {
     local.enable_new_relic ? { new_relic = awscc_devopsagent_service.new_relic[0].service_id } : {},
     local.enable_git_lab ? { git_lab = awscc_devopsagent_service.git_lab[0].service_id } : {},
     local.enable_pager_duty ? { pager_duty = awscc_devopsagent_service.pager_duty[0].service_id } : {},
-    local.enable_datadog ? { datadog = awscc_devopsagent_service.datadog[0].service_id } : {},
   )
 }
 
@@ -76,6 +75,5 @@ output "integration_association_ids" {
     local.enable_new_relic ? { new_relic = awscc_devopsagent_association.new_relic[0].association_id } : {},
     local.enable_git_lab ? { git_lab = awscc_devopsagent_association.git_lab[0].association_id } : {},
     local.enable_pager_duty ? { pager_duty = awscc_devopsagent_association.pager_duty[0].association_id } : {},
-    local.enable_datadog ? { datadog = awscc_devopsagent_association.datadog[0].association_id } : {},
   )
 }

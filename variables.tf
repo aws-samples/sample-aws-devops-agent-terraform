@@ -107,14 +107,10 @@ variable "integrations" {
       services       = optional(list(string))
     }))
 
-    datadog = optional(object({
-      name           = string
-      endpoint       = string
-      api_key_value  = string
-      api_key_name   = optional(string)
-      api_key_header = optional(string)
-      description    = optional(string)
-    }))
+    # NOTE: Datadog is not included here. It requires interactive user OAuth
+    # authorization (browser login + consent) that Terraform cannot automate.
+    # See the comment in integrations.tf for details; register it manually
+    # through the console instead.
   })
 
   default = {}
