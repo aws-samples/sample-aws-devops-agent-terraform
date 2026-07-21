@@ -45,6 +45,7 @@ tags = {
 #
 #   service_now = {
 #     instance_url  = "<SERVICENOW_INSTANCE_URL>"
+#     instance_id   = "<SERVICENOW_INSTANCE_ID>"  # short instance name, e.g. "ven04972" — required, do NOT rely on instance_url fallback
 #     client_id     = "<SERVICENOW_CLIENT_ID>"
 #     client_name   = "<SERVICENOW_CLIENT_NAME>"
 #     client_secret = "<SERVICENOW_CLIENT_SECRET>"

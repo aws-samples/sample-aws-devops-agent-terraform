@@ -154,6 +154,8 @@ Third-party integrations are configured through the `integrations` variable. Bec
    }
    ```
 
+   > **ServiceNow gotcha:** always set `instance_id` explicitly (the short instance name, e.g. `"ven04972"` — not the full `instance_url`). If `instance_id` is omitted, the association falls back to `instance_url`, which the DevOps Agent API rejects with a `400 GeneralServiceException: instanceId '<url>' does not match the registered ServiceNow instance`.
+
 2. **Apply**:
    ```bash
    terraform apply
@@ -178,7 +180,9 @@ Third-party integrations are configured through the `integrations` variable. Bec
 
 ## Troubleshooting
 
-- IAM propagation delays: The configuration includes a 30-second `time_sleep` between IAM role creation and Agent Space creation. The DevOps Agent service validates the operator role's trust policy during Agent Space creation, and this can fail if IAM hasn't fully propagated. If you still see trust policy errors, wait a minute and run `terraform apply` again — the IAM roles will already exist and the apply will pick up where it left off.
+- **IAM propagation delays**: The configuration includes a 30-second `time_sleep` between IAM role creation and Agent Space creation. The DevOps Agent service validates the operator role's trust policy during Agent Space creation, and this can fail if IAM hasn't fully propagated. If you still see trust policy errors, wait a minute and run `terraform apply` again — the IAM roles will already exist and the apply will pick up where it left off.
+- **ServiceNow `instanceId does not match` error**: Set `instance_id` explicitly in the `service_now` integration block to the short instance name (e.g. `"ven04972"`), not the full `instance_url`. See the note in [Part 3](#part-3-optional-register-third-party-integrations) above.
+- **Dynatrace association `status: invalid`**: If `terraform apply` succeeds but the resulting association reports `status = "invalid"` (visible via `aws devops-agent get-association` or the console), this indicates Dynatrace rejected the OAuth client credentials — double-check `client_id`, `client_secret`, and `account_urn` against the Dynatrace account, rather than a Terraform configuration issue.
 
 ## Cleanup
 
