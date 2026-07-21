@@ -82,7 +82,7 @@ variable "integrations" {
     new_relic = optional(object({
       api_key          = string
       account_id       = string
-      endpoint         = string
+      endpoint         = optional(string, "https://mcp.newrelic.com/mcp/")
       region           = optional(string, "US")
       application_ids  = optional(list(string))
       entity_guids     = optional(list(string))

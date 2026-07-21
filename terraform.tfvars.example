@@ -62,7 +62,7 @@ tags = {
 #     api_key    = "<NEW_RELIC_API_KEY>"
 #     account_id = "<NEW_RELIC_ACCOUNT_ID>"
 #     region     = "US"
-#     endpoint   = "https://mcp.newrelic.com/mcp/"
+#     # endpoint defaults to "https://mcp.newrelic.com/mcp/" — override only if needed
 #   }
 #
 #   git_lab = {
