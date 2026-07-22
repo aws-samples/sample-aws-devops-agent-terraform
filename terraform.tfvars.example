@@ -86,3 +86,13 @@ tags = {
 # --- Option: Use existing IAM roles instead of creating new ones ---
 # existing_agentspace_role_arn = "arn:aws:iam::ACCOUNT_ID:role/YourAgentSpaceRole"
 # existing_operator_role_arn   = "arn:aws:iam::ACCOUNT_ID:role/YourOperatorRole"
+
+# --- Alternative: Dynatrace via Secrets Manager (recommended for production) ---
+# Store OAuth credentials in Secrets Manager as JSON:
+#   {"client_id": "dt0s02.X", "client_name": "my-client", "client_secret": "dt0s02.X.secret"}
+# Then reference the ARN here (no plaintext secrets in tfvars):
+#
+# dynatrace_secret_arn  = "arn:aws:secretsmanager:us-east-1:ACCOUNT:secret:devops-agent/dynatrace-AbCdEf"
+# dynatrace_account_urn = "urn:dtaccount:a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+# dynatrace_env_id      = "abc12345"
+# dynatrace_resources   = []  # optional resource scoping
