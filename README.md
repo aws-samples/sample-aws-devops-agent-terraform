@@ -198,3 +198,25 @@ terraform destroy
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Secrets Manager integration (production recommended)
+
+For production deployments, store integration credentials in AWS Secrets Manager
+instead of plaintext tfvars. The `secrets-manager.tf` file provides a
+Dynatrace example:
+
+```hcl
+# terraform.tfvars
+dynatrace_secret_arn  = "arn:aws:secretsmanager:us-east-1:123456789012:secret:devops-agent/dynatrace-AbCdEf"
+dynatrace_account_urn = "urn:dtaccount:a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+dynatrace_env_id      = "abc12345"
+dynatrace_resources   = ["HOST-123"]  # optional
+```
+
+The secret should be a JSON object:
+```json
+{"client_id": "dt0s02.X", "client_name": "my-client", "client_secret": "dt0s02.X.secret"}
+```
+
+If both `var.integrations.dynatrace` and `dynatrace_secret_arn` are set,
+`integrations.tf` takes precedence and the Secrets Manager path is skipped.
